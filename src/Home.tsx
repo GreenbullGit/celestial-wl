@@ -43,6 +43,7 @@ const Home = (props: HomeProps) => {
   const [isSoldOut, setIsSoldOut] = useState(false); // true when items remaining is zero
   const [isMinting, setIsMinting] = useState(false); // true when user got to press MINT
   const [isWhitelisted, SetWhitelisted] = useState(false);
+  const [hasReserves, SetHasReserves] = useState(false);
 
   const [itemsAvailable, setItemsAvailable] = useState(0);
   const [itemsRedeemed, setItemsRedeemed] = useState(0);
@@ -121,13 +122,17 @@ const Home = (props: HomeProps) => {
             severity: "success",
           });
           const to_send = await JSON.stringify({"reserve": res_num-1})
-          await fetch(`${api_url}/whitelisted/update/${(wallet as anchor.Wallet).publicKey.toString()}/${process.env.REACT_APP_SECRET_KEY}`, {
+          const response = await fetch(`${api_url}/whitelisted/update/${(wallet as anchor.Wallet).publicKey.toString()}/${process.env.REACT_APP_SECRET_KEY}`, {
             method: "PUT",
             headers: {
             'Content-Type': 'application/json',
             },
             body: to_send})
           console.log("Updated Reserves for user")
+          const responseData = await response.json();
+          if (responseData.reserve == 0){
+            SetHasReserves(false);
+          }
 
         } else {
           setAlertState({
@@ -182,7 +187,11 @@ const Home = (props: HomeProps) => {
         setBalance(balance / LAMPORTS_PER_SOL);
         const data = await fetch(`${api_url}/whitelisted/member/${(wallet as anchor.Wallet).publicKey.toString()}`)
         if(data.status.toString() !== "404"){
+          const jsonData = await data.json();
           SetWhitelisted(true)
+          if(jsonData.reserve > 0){
+            SetHasReserves(true)
+          }
         }
         else{
           console.log("not found")
@@ -216,7 +225,7 @@ const Home = (props: HomeProps) => {
           <ConnectButton>Connect Wallet</ConnectButton>
         ) : (
           <MintButton
-            disabled={!isWhitelisted || isSoldOut || isMinting || !isActive} //change happened here
+            disabled={!isWhitelisted || isSoldOut || isMinting || !isActive || is} //change happened here
             onClick={onMint}
             variant="contained"
           >
