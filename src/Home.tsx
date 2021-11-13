@@ -225,7 +225,7 @@ const Home = (props: HomeProps) => {
           <ConnectButton>Connect Wallet</ConnectButton>
         ) : (
           <MintButton
-            disabled={!isWhitelisted || isSoldOut || isMinting || !isActive || is} //change happened here
+            disabled={!isWhitelisted || isSoldOut || isMinting || !isActive || !hasReserves} //change happened here
             onClick={onMint}
             variant="contained"
           >
