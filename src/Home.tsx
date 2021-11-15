@@ -5,7 +5,8 @@ import { Button, CircularProgress, Snackbar } from "@material-ui/core";
 import Alert from "@material-ui/lab/Alert";
 
 import * as anchor from "@project-serum/anchor";
-
+import { Navigation } from "./components/navigation";
+import { Header } from "./components/header";
 import { LAMPORTS_PER_SOL } from "@solana/web3.js";
 
 import { useAnchorWallet } from "@solana/wallet-adapter-react";
@@ -19,13 +20,23 @@ import {
   shortenAddress,
 } from "./candy-machine";
 
-const ConnectButton = styled(WalletDialogButton)``;
+const ConnectButton = styled(WalletDialogButton)({
+  color: 'darkslategray',
+  backgroundColor: 'aliceblue',
+  padding: 8,
+  borderRadius: 4,
+});
 
 const CounterText = styled.span``; // add your styles here
 
 const MintContainer = styled.div``; // add your styles here
 
-const MintButton = styled(Button)``; // add your styles here
+const MintButton = styled(Button)({
+  color: 'darkslategray',
+  backgroundColor: 'aliceblue',
+  padding: 8,
+  borderRadius: 4,
+}); // add your styles here
 
 export interface HomeProps {
   candyMachineId: anchor.web3.PublicKey;
@@ -180,6 +191,27 @@ const Home = (props: HomeProps) => {
     }
   };
 
+  const [images,setImages] = useState([
+    "img/8.png",
+    "img/12.png",
+    "img/20.png",
+  ]);
+  const [currentImage,setCurrentImage] = useState(0);
+  var intervalId;
+
+  const switchImage = () => {
+    if (currentImage < images.length - 1) {
+      setCurrentImage(currentImage + 1);
+    } else {
+      setCurrentImage(0);
+      }
+    return currentImage;
+  }
+
+  useEffect(() => {
+      window.setTimeout(switchImage, 2000)
+  },[currentImage]);
+
   useEffect(() => {
     (async () => {
       if (wallet) {
@@ -208,6 +240,86 @@ const Home = (props: HomeProps) => {
 
   return (
     <main>
+      <nav id='menu' className='navbar navbar-default'>
+      <div className='container'>
+        <div className='navbar-header'>
+          
+          <a className='navbar-brand page-scroll' href='#page-top'>
+            Celestial Body Shop
+          </a>{' '}
+          <ul className='nav navbar-nav navbar-right'>
+            <li className='social-button'>
+            <a href={'/'}>
+                      <i className='fa fa-lg fa-twitter page-scroll social-button'></i>
+                    </a>
+            </li>
+            <li className='social-button'>
+            <a href={ '/'}>
+                      <i className='fab fa-lg fa-discord page-scroll social-button'></i>
+                    </a>
+            </li>
+            <li>
+              {!wallet ? (
+                <ConnectButton>Connect Wallet</ConnectButton>
+               ) :
+               <a href={ '/'}>
+                      Connected wallet: {shortenAddress(wallet.publicKey.toBase58())}
+                    </a>}
+            </li>
+          </ul>
+        </div>
+
+        
+      </div>
+    </nav>
+    <header id='header'>
+      <div className='col-md-12 intro'>
+        <div className="col-sm-4 minter-container">
+        {wallet &&    
+          <div className='col-md-6 grid'>
+            <p className='counter-text'>Cars left in the bodyshop </p>
+            <p className='counter-text'>{itemsRemaining} / 4444</p>
+              <MintContainer>
+              <MintButton
+                disabled={!isWhitelisted || isSoldOut || isMinting || !isActive || !hasReserves} //change happened here
+                onClick={onMint}
+                variant="contained"
+                className="fuckubutton"
+              >
+                {isSoldOut ? (
+                  "SOLD OUT"
+                ) : isActive ? (
+                  isMinting ? (
+                    <CircularProgress />
+                  ) : (
+                    "MINT MINE"
+                  )
+                ) : (
+                  <Countdown
+                    date={startDate}
+                    onMount={({ completed }) => completed && setIsActive(true)}
+                    onComplete={() => setIsActive(true)}
+                    renderer={renderCounter}
+                  />
+                )}
+              </MintButton>
+              </MintContainer>
+          </div>
+        }
+        {!wallet && 
+          <div className='col-md-6 grid'>
+           <p className='counter-text'>Connect your wallet first </p>
+            </div>
+        }
+          <div className='col-md-6 pic-box'>
+            
+                  <img src={images[currentImage]} className="img-responsive mint-pic" alt="" />{" "}
+           
+          </div>
+        </div>
+        
+      </div>
+    </header>
       {wallet && (
         <p>Wallet {shortenAddress(wallet.publicKey.toBase58() || "")}</p>
       )}
@@ -220,34 +332,7 @@ const Home = (props: HomeProps) => {
 
       {wallet && <p>Remaining: {itemsRemaining}</p>}
 
-      <MintContainer>
-        {!wallet ? (
-          <ConnectButton>Connect Wallet</ConnectButton>
-        ) : (
-          <MintButton
-            disabled={!isWhitelisted || isSoldOut || isMinting || !isActive || !hasReserves} //change happened here
-            onClick={onMint}
-            variant="contained"
-          >
-            {isSoldOut ? (
-              "SOLD OUT"
-            ) : isActive ? (
-              isMinting ? (
-                <CircularProgress />
-              ) : (
-                "MINT"
-              )
-            ) : (
-              <Countdown
-                date={startDate}
-                onMount={({ completed }) => completed && setIsActive(true)}
-                onComplete={() => setIsActive(true)}
-                renderer={renderCounter}
-              />
-            )}
-          </MintButton>
-        )}
-      </MintContainer>
+      
 
       <Snackbar
         open={alertState.open}

@@ -21,6 +21,8 @@ import {
 
 import { WalletDialogProvider } from "@solana/wallet-adapter-material-ui";
 import { createTheme, ThemeProvider } from "@material-ui/core";
+import { Navigation } from "./components/navigation";
+import { Header } from "./components/header";
 
 const treasury = new anchor.web3.PublicKey(
   process.env.REACT_APP_TREASURY_ADDRESS!
@@ -45,19 +47,53 @@ const txTimeout = 30000; // milliseconds (confirm this works for your project)
 
 const theme = createTheme({
     palette: {
-        type: 'dark',
-    },
+      type: 'dark',
+  },
     overrides: {
         MuiButtonBase: {
             root: {
                 justifyContent: 'flex-start',
+                "&$focusVisible": {
+                  "backgroundColor": "#ff53e8"
+                }
             },
         },
         MuiButton: {
             root: {
                 textTransform: undefined,
                 padding: '12px 16px',
+                
             },
+            containedPrimary: {
+              backgroundColor: '#1a1a1a',
+              borderColor: '#ff92ee',
+              color: '#fff',
+              border: '1px solid',
+              fontFamily: 'Raleway, sans-serif',
+              WebkitTextStrokeWidth: '1px',
+              WebkitTextStrokeColor: '#ff92ee',
+              textTransform: 'uppercase',
+              fontSize: '18px',
+              padding: '5px 0px',
+              marginRight: '10px',
+              fontWeight: 'bold',
+              "&:hover": {
+                backgroundColor: "#ffb6f2",
+                WebkitTextStrokeColor: 'black',
+                color: 'black',
+              }
+            },
+            outlinedPrimary: {
+              backgroundColor: '#ff53e8'
+            },
+            outlined: {
+              "&:hover": {
+                backgroundColor: "#35C37D"
+              }
+            },
+            
+
+            
             startIcon: {
                 marginRight: 8,
             },
@@ -65,6 +101,20 @@ const theme = createTheme({
                 marginLeft: 8,
             },
         },
+        MuiDialogTitle: {
+          root: {
+            backgroundColor: '#1a1a1a !important' ,
+            fontFamily: 'Raleway, sans-serif',
+              WebkitTextStrokeWidth: '1px',
+              WebkitTextStrokeColor: '#ff92ee',
+              color: '#fff',
+          }
+        },
+        MuiDialogContent: {
+          root: {
+            margin: '0px !important',
+          }
+        }
     },
 });
 
@@ -84,10 +134,12 @@ const App = () => {
 
   return (
       <>
+        
         <ThemeProvider theme={theme}>
           <ConnectionProvider endpoint={endpoint}>
             <WalletProvider wallets={wallets} autoConnect={true}>
               <WalletDialogProvider>
+              
                 <Home
                   candyMachineId={candyMachineId}
                   config={config}
