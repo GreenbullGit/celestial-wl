@@ -27,7 +27,7 @@ const ConnectButton = styled(WalletDialogButton)({
   borderRadius: 4,
 });
 
-const CounterText = styled.span``; // add your styles heree
+const CounterText = styled.span``; // add your styles here
 
 const MintContainer = styled.div``; // add your styles here
 
