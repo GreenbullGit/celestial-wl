@@ -127,6 +127,7 @@ const Home = (props: HomeProps) => {
         );
 
         if (!status?.err) {
+          SetHasReserves(false);
           setAlertState({
             open: true,
             message: "Congratulations! Mint succeeded!",
@@ -139,11 +140,6 @@ const Home = (props: HomeProps) => {
             'Content-Type': 'application/json',
             },
             body: to_send})
-          console.log("Updated Reserves for user")
-          const responseData = await response.json();
-          if (responseData.reserve == 0){
-            SetHasReserves(false);
-          }
 
         } else {
           setAlertState({
@@ -185,6 +181,12 @@ const Home = (props: HomeProps) => {
       if (wallet) {
         const balance = await props.connection.getBalance(wallet.publicKey);
         setBalance(balance / LAMPORTS_PER_SOL);
+      }
+      let res = await fetch(`${api_url}/whitelisted/member/${(wallet as anchor.Wallet).publicKey.toString()}`, {method: "GET"})
+      const res_json = await res.json()
+      const res_num = await JSON.parse(JSON.stringify(res_json)).reserve //The number  of reserves the user has left
+      if (res_num > 0){
+        SetHasReserves(true);
       }
       setIsMinting(false);
       refreshCandyMachineState();
